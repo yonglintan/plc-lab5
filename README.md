@@ -266,7 +266,7 @@ In the `tokenizer.c` file, there is a function `tokenizeBooleanExpression()`. Th
 - `lparen`: The `CFGSymbol` for `"("`.
 - `rparen`: The `CFGSymbol` for `")"`.
 
-## Question 3-G
+### Question 3-G
 
 Implement the function `tokenizeBooleanExpression()`. Your function should read the input string character by character, identify valid tokens, ignore spaces (do not tokenize them!) and store them in the array `symbols`. It should also update `symbol_count` accordingly and detect errors if any. Reuse the function prototype and show your code.
 
