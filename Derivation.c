@@ -13,6 +13,9 @@ typedef struct {
   // false, 1 = true)
   // - is_start: An int, which indicates whether the symbol is a start symbol (0
   // = false, 1 = true)
+  char *symbol;
+  int is_terminal;
+  int is_start;
 } CFGSymbol;
 
 // Struct for production rules
@@ -20,6 +23,9 @@ typedef struct {
   // - lhs: Left-hand side of the production rule (always a non-terminal)
   // - rhs: Right-hand side of the production rule, with size MAX_RHS.
   // - rhs_length: Number of symbols on the RHS
+  CFGSymbol lhs;
+  CFGSymbol rhs[MAX_RHS];
+  int rhs_length;
 } CFGProductionRule;
 
 // Struct for CFG
@@ -29,6 +35,11 @@ typedef struct {
 // - symbol_count: Number of symbols in the CFG
 // - rule_count: Number of rules in the CFG
 typedef struct {
+  CFGSymbol symbols[MAX_SYMBOLS];
+  CFGSymbol startSymbol;
+  CFGProductionRule rules[MAX_RULES];
+  int symbol_count;
+  int rule_count;
 } CFG;
 
 // Function prototypes
@@ -41,13 +52,15 @@ void printArraySymbols(CFGSymbol *symbols, int count);
 
 // Function to start derivation with the start symbol
 void startDerivation(CFGSymbol *derivation, int *derivation_length, CFG *cfg) {
-  ;
+  printf("Start Derivation\n");
+  derivation[0] = cfg->startSymbol;
+  *derivation_length = 1;
 }
 
 // Function to apply a production rule to a derivation step
 void applyProductionRule(CFGSymbol *derivation, int *derivation_length,
                          CFG *cfg, int ruleIndex, int position) {
-  if (;) {
+  if (ruleIndex > cfg->rule_count) {
     // check the rule index
     printf("Invalid rule index.\n");
     return;
@@ -55,40 +68,41 @@ void applyProductionRule(CFGSymbol *derivation, int *derivation_length,
   CFGProductionRule rule = cfg->rules[ruleIndex - 1];
 
   // Ensure the position is valid and matches the LHS of the production rule
-  if (;) {
+  if (position < *derivation_length &&
+      strcmp(derivation[position].symbol, rule.lhs.symbol)) {
     printf("Rule cannot be applied at the given position.\n");
     return;
   }
 
   // Calculate new derivation length after applying the rule
-  if (;) {
+  *derivation_length = *derivation_length + rule.rhs_length - 1;
+  if (*derivation_length > MAX_TOKENS) {
     printf("Applying the rule exceeds the maximum derivation length.\n");
     return;
   }
 
   // Shift symbols to accommodate the new RHS symbols
-  for (;) {
-    ;
+  for (int i = *derivation_length - 1; i == position; --i) {
+    derivation[i] = derivation[i - (rule.rhs_length - 1)];
   }
 
   // Insert RHS symbols into the derivation array
-  for (;) {
-    ;
+  for (int i = 0; i < rule.rhs_length; ++i) {
+    derivation[position + i] = rule.rhs[i];
   }
-
-  *derivation_length = new_length;
 }
 
 // Function to check if derivation matches the expected token sequence
 int checkDerivation(CFGSymbol *derivation, int derivation_length,
                     CFGSymbol *tokens, int token_count) {
-  if (;) { // check length matching
+  if (derivation_length != token_count) { // check length matching
     printf("Derivation unsuccessful: Length mismatch.\n");
     return 0;
   }
 
-  for (;) {
-    if (;) { // check position matching
+  for (int i = 0; i < derivation_length; ++i) {
+    if (strcmp(derivation[i].symbol,
+               tokens[i].symbol)) { // check position matching
       printf("Derivation unsuccessful: Mismatch at position %d.\n", i);
       return 0;
     }
