@@ -15,7 +15,9 @@
 // - is_start: An int, which indicates whether the symbol is a start symbol (0 =
 // false, 1 = true)
 typedef struct {
-  ? ? ?
+  char *symbol;
+  int is_terminal;
+  int is_start;
 } CFGSymbol;
 
 // Struct for a production rule of our CFG.
@@ -27,23 +29,33 @@ typedef struct {
 // - rhs_length: An int denoting the number of symbols in the right-hand side
 // array.
 typedef struct {
-  ? ? ?
+  CFGSymbol lhs;
+  CFGSymbol *rhs;
+  int rhs_length;
 } CFGProductionRule;
 
 // Generic function to initialize a CFGSymbol.
 void init_CFGSymbol(CFGSymbol *symbol, char *text, int is_terminal,
                     int is_start) {
-  ? ? ?
+  symbol->symbol = text;
+  symbol->is_terminal = is_terminal;
+  symbol->is_start = is_start;
 }
 
 // Specific initializers for different types of symbols (non-terminal symbol).
-void init_NonTerminal(CFGSymbol *symbol, char *text) { ? ? ? }
+void init_NonTerminal(CFGSymbol *symbol, char *text) {
+  init_CFGSymbol(symbol, text, 0, 0);
+}
 
 // Specific initializers for different types of symbols (terminal symbol).
-void init_Terminal(CFGSymbol *symbol, char *text) { ? ? ? }
+void init_Terminal(CFGSymbol *symbol, char *text) {
+  init_CFGSymbol(symbol, text, 1, 0);
+}
 
 // Specific initializers for different types of symbols (start symbol).
-void init_StartSymbol(CFGSymbol *symbol, char *text){? ? ? }
+void init_StartSymbol(CFGSymbol *symbol, char *text) {
+  init_CFGSymbol(symbol, text, 0, 1);
+}
 
 // Function to create a production rule.
 // - It should check if lhs is a non-terminal symbol.
@@ -58,12 +70,27 @@ CFGProductionRule createProductionRule(CFGSymbol lhs, CFGSymbol rhs[],
   int i;
 
   // Check that lhs is not a terminal symbol (otherwise, problem)
-  ? ? ?
+  if (lhs.is_terminal) {
+    printf(
+        "ERR: Found terminal symbol %s on left-hand side of production rule.",
+        lhs.symbol);
+    rule.rhs_length = -1;
+    return rule;
+  }
+  rule.lhs = lhs;
 
-      // Iterate through the right-hand side symbols and print them.
-      // Initialize rhs_length to 0.
-      // Later, count the actual length of rhs until the '\0' symbol is found.
-      ? ? ?
+  // Iterate through the right-hand side symbols and print them.
+  // Initialize rhs_length to 0.
+  // Later, count the actual length of rhs until the '\0' symbol is found.
+  rule.rhs = rhs;
+  for (i = 0; i < rhs_length; ++i) {
+    printf("Symbol: %s\n", rhs[i].symbol);
+    // if (rhs[i].symbol[0] == '\0') {
+    //   break;
+    // }
+  }
+  rule.rhs_length = i;
+  return rule;
 }
 
 // Function to print a production rule.
@@ -73,13 +100,13 @@ CFGProductionRule createProductionRule(CFGSymbol lhs, CFGSymbol rhs[],
 void printProductionRule(CFGProductionRule rule) {
   int i;
 
-    printf("%c", ???);
-    printf(" --> ");
-        for (???) {
-                printf(???);
-        }
-        printf("\n");
-        return;
+  printf("%s", rule.lhs.symbol);
+  printf(" --> ");
+  for (i = 0; i < rule.rhs_length; ++i) {
+    printf("%s ", rule.rhs[i].symbol);
+  }
+  printf("\n");
+  return;
 }
 
 // Struct for the full CFG.
@@ -93,7 +120,11 @@ void printProductionRule(CFGProductionRule rule) {
 // - rule_count: An int, denoting the number of CFGProductionRule elements in
 // the rules array.
 typedef struct {
-  ? ? ?
+  CFGSymbol *symbols;
+  CFGSymbol startSymbol;
+  CFGProductionRule *rules;
+  int symbol_count;
+  int rule_count;
 } CFG;
 
 // Function to create a CFG.
@@ -104,7 +135,11 @@ typedef struct {
 void init_CFG(CFG *cfg, CFGSymbol symbols[], int symbol_count,
               CFGSymbol startSymbol, CFGProductionRule rules[],
               int rule_count) {
-  ? ? ?
+  cfg->symbols = symbols;
+  cfg->startSymbol = startSymbol;
+  cfg->rules = rules;
+  cfg->symbol_count = symbol_count;
+  cfg->rule_count = rule_count;
 }
 
 // Function for printing the CFG as expected.
@@ -113,8 +148,8 @@ void printCFG(const CFG cfg) {
   int i;
 
   for (i = 0; i < cfg.rule_count; i++) {
-        printf("(%d):   ", ???);
-        printProductionRule(???);
+    printf("(%d):   ", i + 1);
+    printProductionRule(cfg.rules[i]);
   }
 }
 
