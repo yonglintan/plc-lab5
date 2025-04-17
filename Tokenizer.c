@@ -47,7 +47,6 @@ void tokenizeBooleanExpression(char *str, CFGSymbol *symbols, int *symbol_count,
   int i = 0;
 
   while (str[i] != '\0') {
-    printf("Looking for next token from '%s'\n", &str[i]);
     // Skip whitespace
     if (isspace(str[i])) {
       ++i;
@@ -62,115 +61,71 @@ void tokenizeBooleanExpression(char *str, CFGSymbol *symbols, int *symbol_count,
     buffer[0] = '\0';
     int j = 0;
 
-    int can_match_and = 1;
-    int can_match_or = 1;
-    int can_match_true = 1;
-    int can_match_false = 1;
-    int can_match_lparen = 1;
-    int can_match_rparen = 1;
-
-    while (1) {
+    while (str[i + j] != '\0') {
       buffer[j] = str[i + j];
       buffer[j + 1] = '\0';
-      int char_matched = 0;
+      int partial_match = 0;
 
       // Check through all possible tokens
-      if (can_match_and) {
-        if (buffer[j] == and_sym->symbol[j]) {
-          // Expected character found, check if full match has been found
-          char_matched = 1;
-          if (strlen(buffer) == strlen(and_sym->symbol)) {
-            // Full match found, store match and stop looking for this token
-            match = *and_sym;
-            can_match_and = 0;
-          }
-        } else {
-          // Char is not expected char, can no longer be this token
-          can_match_and = 0;
-        }
+      // strncmp tells me whether or not I have a partial match
+      // I still need to check if I have a full match
+      if (!strncmp(buffer, and_sym->symbol, j + 1)) {
+        // Expected character found, check if full match has been found
+        if (strlen(buffer) == strlen(and_sym->symbol)) {
+          // Full match found, store match and stop looking for this token
+          match = *and_sym;
+        } else
+          partial_match = 1;
       }
-      if (can_match_or) {
-        if (buffer[j] == or_sym->symbol[j]) {
-          // Expected character found, check if full match has been found
-          char_matched = 1;
-          if (strlen(buffer) == strlen(or_sym->symbol)) {
-            // Full match found, store match and stop looking for this token
-            match = *or_sym;
-            can_match_or = 0;
-          }
-        } else {
-          // Char is not expected char, can no longer be this token
-          can_match_or = 0;
-        }
+      if (!strncmp(buffer, or_sym->symbol, j + 1)) {
+        // Expected character found, check if full match has been found
+        if (strlen(buffer) == strlen(or_sym->symbol)) {
+          // Full match found, store match and stop looking for this token
+          match = *or_sym;
+        } else
+          partial_match = 1;
       }
-      if (can_match_true) {
-        if (buffer[j] == true_sym->symbol[j]) {
-          // Expected character found, check if full match has been found
-          char_matched = 1;
-          if (strlen(buffer) == strlen(true_sym->symbol)) {
-            // Full match found, store match and stop looking for this token
-            match = *true_sym;
-            can_match_true = 0;
-          }
-        } else {
-          // Char is not expected char, can no longer be this token
-          can_match_true = 0;
-        }
+      if (!strncmp(buffer, true_sym->symbol, j + 1)) {
+        // Expected character found, check if full match has been found
+        if (strlen(buffer) == strlen(true_sym->symbol)) {
+          // Full match found, store match and stop looking for this token
+          match = *true_sym;
+        } else
+          partial_match = 1;
       }
-      if (can_match_false) {
-        if (buffer[j] == false_sym->symbol[j]) {
-          // Expected character found, check if full match has been found
-          char_matched = 1;
-          if (strlen(buffer) == strlen(false_sym->symbol)) {
-            // Full match found, store match and stop looking for this token
-            match = *false_sym;
-            can_match_false = 0;
-          }
-        } else {
-          // Char is not expected char, can no longer be this token
-          can_match_false = 0;
-        }
+      if (!strncmp(buffer, false_sym->symbol, j + 1)) {
+        // Expected character found, check if full match has been found
+        if (strlen(buffer) == strlen(false_sym->symbol)) {
+          // Full match found, store match and stop looking for this token
+          match = *false_sym;
+        } else
+          partial_match = 1;
       }
-      if (can_match_lparen) {
-        if (buffer[j] == lparen->symbol[j]) {
-          // Expected character found, check if full match has been found
-          char_matched = 1;
-          if (strlen(buffer) == strlen(lparen->symbol)) {
-            // Full match found, store match and stop looking for this token
-            match = *lparen;
-            can_match_lparen = 0;
-          }
-        } else {
-          // Char is not expected char, can no longer be this token
-          can_match_lparen = 0;
-        }
+      if (!strncmp(buffer, lparen->symbol, j + 1)) {
+        // Expected character found, check if full match has been found
+        if (strlen(buffer) == strlen(lparen->symbol)) {
+          // Full match found, store match and stop looking for this token
+          match = *lparen;
+        } else
+          partial_match = 1;
       }
-      if (can_match_rparen) {
-        if (buffer[j] == rparen->symbol[j]) {
-          // Expected character found, check if full match has been found
-          char_matched = 1;
-          if (strlen(buffer) == strlen(rparen->symbol)) {
-            // Full match found, store match and stop looking for this token
-            match = *rparen;
-            can_match_rparen = 0;
-          }
-        } else {
-          // Char is not expected char, can no longer be this token
-          can_match_rparen = 0;
-        }
+      if (!strncmp(buffer, rparen->symbol, j + 1)) {
+        // Expected character found, check if full match has been found
+        if (strlen(buffer) == strlen(rparen->symbol)) {
+          // Full match found, store match and stop looking for this token
+          match = *rparen;
+        } else
+          partial_match = 1;
       }
 
-      // Check if any character was matched. If no match, either add the best
+      // Check if any partial matches. If none, either add the best
       // found match and continue tokenization or error
-      if (!char_matched) {
-        printf("No char matched: %c\n", str[i + j]);
+      if (!partial_match) {
         if (strcmp(match.symbol, "")) {
           // Existing match
           symbols[*symbol_count] = match;
           ++*symbol_count;
-          printf("Found symbol: %s\n", match.symbol);
           i += strlen(match.symbol);
-          printf("Set i to %d\n", i);
           break;
         } else {
           printf("[ERROR] Unexpected character: %c\n", str[i + j]);
