@@ -372,25 +372,69 @@ You may assume that the input strings only consist of Boolean values (`true`, `f
 
 Implement the struct for `CFG symbols`. Show your code.
 
+> ```c
+> typedef struct {
+>   char *symbol;
+>   int is_terminal;
+>   int is_start;
+> } CFGSymbol;
+> ```
+
 ### Question 3-B
 
 Implement the function `init_CFGSymbol()`. Show your code.
+
+> ```c
+> void init_CFGSymbol(CFGSymbol *symbol, char *text, int is_terminal,
+>                     int is_start) {
+>   symbol->symbol = text;
+>   symbol->is_terminal = is_terminal;
+>   symbol->is_start = is_start;
+> }
+> ```
 
 ### Question 3-C
 
 Implement the function `init_Terminal()`. Show your code.
 
+> ```c
+> void init_Terminal(CFGSymbol *symbol, char *text) {
+>   init_CFGSymbol(symbol, text, 1, 0);
+> }
+> ```
+
 ### Question 3-D
 
 Why are we reusing the `init_Terminal()` function, but not the `init_NonTerminal()` function here?
+
+> The tokenizer should only recognise and produce terminal symbols, as non-terminal symbols are only intermediate symbols with no real symbol.
 
 ### Question 3-E
 
 What would be the regular expression (RegEx) to check whether a string `"s"` is a valid Boolean keyword (`true` or `false`)? Is RegEx even needed for this task?
 
+> The RegEx is `^(true | false)$`. RegEx is not necessary for this task, as naively comparing the entire word will do.
+
 ### Question 3-F
 
 What would be the **pseudo-code** for our maximal munch algorithm? Keep it as simple as possible. Show your pseudo-code.
+
+```
+word_start = 0;
+while word_start < length(input_str):
+    increment word_start until it is at non-whitespace character
+    cur_word = ""
+    match = None
+    while any symbol starts with cur_word:
+        for symbol
+            if symbol == cur_word, match = symbol
+        cur_word += next_char
+    if match is None:
+        error
+    else:
+        found_symbols.add(match);
+        word_start += length(match)
+```
 
 ### Implementing a tokenizing function
 
@@ -432,6 +476,95 @@ Actual Tokens : ( true OR false )
 [Test Case 5] Tokenizing Invalid Expression: true && false
 [ERROR] Unexpected character: &
 Expected: Error on unexpected character '&'
+```
+
+```c
+void tokenizeBooleanExpression(char *str, CFGSymbol *symbols, int *symbol_count,
+                               CFGSymbol *and_sym, CFGSymbol *or_sym,
+                               CFGSymbol *true_sym, CFGSymbol *false_sym,
+                               CFGSymbol *lparen, CFGSymbol *rparen) {
+  *symbol_count = 0;       // Reset token count
+  char buffer[MAX_LENGTH]; // Token buffer
+  int i = 0;
+
+  while (str[i] != '\0') {
+    // Skip whitespace
+    if (isspace(str[i])) {
+      ++i;
+      buffer[0] = '\0';
+      continue;
+    }
+
+    CFGSymbol match;
+    match.symbol = "";
+
+    // Reset buffer
+    buffer[0] = '\0';
+    int j = 0;
+
+    while (str[i + j] != '\0') {
+      buffer[j] = str[i + j];
+      buffer[j + 1] = '\0';
+      int partial_match = 0;
+
+      // strncmp tells me whether or not I have a partial match
+      if (!strncmp(buffer, and_sym->symbol, j + 1)) {
+        // check if full match
+        if (strlen(buffer) == strlen(and_sym->symbol)) {
+          match = *and_sym;
+        } else
+          partial_match = 1;
+      }
+      if (!strncmp(buffer, or_sym->symbol, j + 1)) {
+        if (strlen(buffer) == strlen(or_sym->symbol)) {
+          match = *or_sym;
+        } else
+          partial_match = 1;
+      }
+      if (!strncmp(buffer, true_sym->symbol, j + 1)) {
+        if (strlen(buffer) == strlen(true_sym->symbol)) {
+          match = *true_sym;
+        } else
+          partial_match = 1;
+      }
+      if (!strncmp(buffer, false_sym->symbol, j + 1)) {
+        if (strlen(buffer) == strlen(false_sym->symbol)) {
+          match = *false_sym;
+        } else
+          partial_match = 1;
+      }
+      if (!strncmp(buffer, lparen->symbol, j + 1)) {
+        if (strlen(buffer) == strlen(lparen->symbol)) {
+          match = *lparen;
+        } else
+          partial_match = 1;
+      }
+      if (!strncmp(buffer, rparen->symbol, j + 1)) {
+        if (strlen(buffer) == strlen(rparen->symbol)) {
+          match = *rparen;
+        } else
+          partial_match = 1;
+      }
+
+      // Check if any partial matches. If none, either add the best
+      // found match and continue tokenization or error
+      if (!partial_match) {
+        if (strcmp(match.symbol, "")) {
+          // Existing match
+          symbols[*symbol_count] = match;
+          ++*symbol_count;
+          i += strlen(match.symbol);
+          break;
+        } else {
+          printf("[ERROR] Unexpected character: %c\n", str[i + j]);
+          return;
+        }
+      }
+
+      ++j;
+    }
+  }
+}
 ```
 
 **This concludes Task 3.**
