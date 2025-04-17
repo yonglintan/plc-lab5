@@ -41,61 +41,61 @@ void printArraySymbols(CFGSymbol *symbols, int count);
 
 // Function to start derivation with the start symbol
 void startDerivation(CFGSymbol *derivation, int *derivation_length, CFG *cfg) {
-  ? ? ?
+  ;
 }
 
 // Function to apply a production rule to a derivation step
 void applyProductionRule(CFGSymbol *derivation, int *derivation_length,
                          CFG *cfg, int ruleIndex, int position) {
-    if (???) {
-      // check the rule index
-      printf("Invalid rule index.\n");
-      return;
-    }
-    CFGProductionRule rule = cfg->rules[ruleIndex - 1];
+  if (;) {
+    // check the rule index
+    printf("Invalid rule index.\n");
+    return;
+  }
+  CFGProductionRule rule = cfg->rules[ruleIndex - 1];
 
-    // Ensure the position is valid and matches the LHS of the production rule
-    if (???) {
-      printf("Rule cannot be applied at the given position.\n");
-      return;
-    }
+  // Ensure the position is valid and matches the LHS of the production rule
+  if (;) {
+    printf("Rule cannot be applied at the given position.\n");
+    return;
+  }
 
-    // Calculate new derivation length after applying the rule
-    if (???) {
-      printf("Applying the rule exceeds the maximum derivation length.\n");
-      return;
-    }
+  // Calculate new derivation length after applying the rule
+  if (;) {
+    printf("Applying the rule exceeds the maximum derivation length.\n");
+    return;
+  }
 
-    // Shift symbols to accommodate the new RHS symbols
-    for (???) {
-      ? ? ?
-    }
+  // Shift symbols to accommodate the new RHS symbols
+  for (;) {
+    ;
+  }
 
-    // Insert RHS symbols into the derivation array
-    for (???) {
-      ? ? ?
-    }
+  // Insert RHS symbols into the derivation array
+  for (;) {
+    ;
+  }
 
-    *derivation_length = new_length;
+  *derivation_length = new_length;
 }
 
 // Function to check if derivation matches the expected token sequence
 int checkDerivation(CFGSymbol *derivation, int derivation_length,
                     CFGSymbol *tokens, int token_count) {
-    if (???) { // check length matching
-      printf("Derivation unsuccessful: Length mismatch.\n");
+  if (;) { // check length matching
+    printf("Derivation unsuccessful: Length mismatch.\n");
+    return 0;
+  }
+
+  for (;) {
+    if (;) { // check position matching
+      printf("Derivation unsuccessful: Mismatch at position %d.\n", i);
       return 0;
     }
+  }
 
-    for (???) {
-        if (???) { // check position matching
-          printf("Derivation unsuccessful: Mismatch at position %d.\n", i);
-          return 0;
-        }
-    }
-
-    printf("Derivation successful!\n");
-    return 1;
+  printf("Derivation successful!\n");
+  return 1;
 }
 
 // Helper function for printing symbols
