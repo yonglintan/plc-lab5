@@ -120,7 +120,7 @@ void printProductionRule(CFGProductionRule rule) {
 // - rule_count: An int, denoting the number of CFGProductionRule elements in
 // the rules array.
 typedef struct {
-  CFGSymbol *symbols;
+  CFGSymbol symbols[MAX_SYMBOLS];
   CFGSymbol startSymbol;
   CFGProductionRule *rules;
   int symbol_count;
@@ -135,7 +135,13 @@ typedef struct {
 void init_CFG(CFG *cfg, CFGSymbol symbols[], int symbol_count,
               CFGSymbol startSymbol, CFGProductionRule rules[],
               int rule_count) {
-  cfg->symbols = symbols;
+  if (symbol_count > sizeof(cfg->symbols) / sizeof(cfg->symbols[0])) {
+    printf("Maximum number of tokens exceeded.\n");
+  }
+
+  for (int i = 0; i < symbol_count; ++i) {
+    cfg->symbols[i] = symbols[i];
+  }
   cfg->startSymbol = startSymbol;
   cfg->rules = rules;
   cfg->symbol_count = symbol_count;
