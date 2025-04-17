@@ -30,7 +30,7 @@ typedef struct {
 // array.
 typedef struct {
   CFGSymbol lhs;
-  CFGSymbol *rhs;
+  CFGSymbol rhs[MAX_RHS];
   int rhs_length;
 } CFGProductionRule;
 
@@ -82,12 +82,12 @@ CFGProductionRule createProductionRule(CFGSymbol lhs, CFGSymbol rhs[],
   // Iterate through the right-hand side symbols and print them.
   // Initialize rhs_length to 0.
   // Later, count the actual length of rhs until the '\0' symbol is found.
-  rule.rhs = rhs;
   for (i = 0; i < rhs_length; ++i) {
     printf("Symbol: %s\n", rhs[i].symbol);
-    // if (rhs[i].symbol[0] == '\0') {
-    //   break;
-    // }
+    if (rhs[i].symbol[0] == '\0') {
+      break;
+    }
+    rule.rhs[i] = rhs[i];
   }
   rule.rhs_length = i;
   return rule;
@@ -122,7 +122,7 @@ void printProductionRule(CFGProductionRule rule) {
 typedef struct {
   CFGSymbol symbols[MAX_SYMBOLS];
   CFGSymbol startSymbol;
-  CFGProductionRule *rules;
+  CFGProductionRule rules[MAX_RULES];
   int symbol_count;
   int rule_count;
 } CFG;
@@ -143,7 +143,9 @@ void init_CFG(CFG *cfg, CFGSymbol symbols[], int symbol_count,
     cfg->symbols[i] = symbols[i];
   }
   cfg->startSymbol = startSymbol;
-  cfg->rules = rules;
+  for (int i = 0; i < rule_count; ++i) {
+    cfg->rules[i] = rules[i];
+  }
   cfg->symbol_count = symbol_count;
   cfg->rule_count = rule_count;
 }
