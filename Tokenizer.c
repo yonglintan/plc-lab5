@@ -8,19 +8,36 @@
 
 // Struct for CFG symbols
 typedef struct {
-  ? ? ?
+  char *symbol;
+  int is_terminal;
+  int is_start;
 } CFGSymbol;
 
 // Generic function to initialize a CFGSymbol
 void init_CFGSymbol(CFGSymbol *symbol, char *text, int is_terminal,
                     int is_start) {
-  ? ? ?
+  symbol->symbol = text;
+  symbol->is_terminal = is_terminal;
+  symbol->is_start = is_start;
 }
 
 // Specific initializer for terminal symbols
-void init_Terminal(CFGSymbol *symbol, char *text) { ? ? ? }
+void init_Terminal(CFGSymbol *symbol, char *text) {
+  init_CFGSymbol(symbol, text, 1, 0);
+}
 
 // Tokenizer function
+// - str: The input Boolean expression, e.g., "true AND (false OR true)".
+// - symbols: The array that will contain up to MAX_TOKENS CFGSymbols after
+// tokenization.
+// - symbol_count: An integer denoting the number of CFGSymbols in the symbols
+// array.
+// - and_sym: The CFGSymbol for the terminal symbol "AND".
+// - or_sym: The CFGSymbol for the terminal symbol "OR".
+// - true_sym: The CFGSymbol for "true".
+// - false_sym: The CFGSymbol for "false".
+// - lparen: The CFGSymbol for "(".
+// - rparen: The CFGSymbol for ")"
 void tokenizeBooleanExpression(char *str, CFGSymbol *symbols, int *symbol_count,
                                CFGSymbol *and_sym, CFGSymbol *or_sym,
                                CFGSymbol *true_sym, CFGSymbol *false_sym,
@@ -29,7 +46,141 @@ void tokenizeBooleanExpression(char *str, CFGSymbol *symbols, int *symbol_count,
   char buffer[MAX_LENGTH]; // Token buffer
   int i = 0;
 
-  ? ? ?
+  while (str[i] != '\0') {
+    printf("Looking for next token from '%s'\n", &str[i]);
+    // Skip whitespace
+    if (isspace(str[i])) {
+      ++i;
+      buffer[0] = '\0';
+      continue;
+    }
+
+    CFGSymbol match;
+    match.symbol = "";
+
+    // Reset buffer
+    buffer[0] = '\0';
+    int j = 0;
+
+    int can_match_and = 1;
+    int can_match_or = 1;
+    int can_match_true = 1;
+    int can_match_false = 1;
+    int can_match_lparen = 1;
+    int can_match_rparen = 1;
+
+    while (1) {
+      buffer[j] = str[i + j];
+      buffer[j + 1] = '\0';
+      int char_matched = 0;
+
+      // Check through all possible tokens
+      if (can_match_and) {
+        if (buffer[j] == and_sym->symbol[j]) {
+          // Expected character found, check if full match has been found
+          char_matched = 1;
+          if (strlen(buffer) == strlen(and_sym->symbol)) {
+            // Full match found, store match and stop looking for this token
+            match = *and_sym;
+            can_match_and = 0;
+          }
+        } else {
+          // Char is not expected char, can no longer be this token
+          can_match_and = 0;
+        }
+      }
+      if (can_match_or) {
+        if (buffer[j] == or_sym->symbol[j]) {
+          // Expected character found, check if full match has been found
+          char_matched = 1;
+          if (strlen(buffer) == strlen(or_sym->symbol)) {
+            // Full match found, store match and stop looking for this token
+            match = *or_sym;
+            can_match_or = 0;
+          }
+        } else {
+          // Char is not expected char, can no longer be this token
+          can_match_or = 0;
+        }
+      }
+      if (can_match_true) {
+        if (buffer[j] == true_sym->symbol[j]) {
+          // Expected character found, check if full match has been found
+          char_matched = 1;
+          if (strlen(buffer) == strlen(true_sym->symbol)) {
+            // Full match found, store match and stop looking for this token
+            match = *true_sym;
+            can_match_true = 0;
+          }
+        } else {
+          // Char is not expected char, can no longer be this token
+          can_match_true = 0;
+        }
+      }
+      if (can_match_false) {
+        if (buffer[j] == false_sym->symbol[j]) {
+          // Expected character found, check if full match has been found
+          char_matched = 1;
+          if (strlen(buffer) == strlen(false_sym->symbol)) {
+            // Full match found, store match and stop looking for this token
+            match = *false_sym;
+            can_match_false = 0;
+          }
+        } else {
+          // Char is not expected char, can no longer be this token
+          can_match_false = 0;
+        }
+      }
+      if (can_match_lparen) {
+        if (buffer[j] == lparen->symbol[j]) {
+          // Expected character found, check if full match has been found
+          char_matched = 1;
+          if (strlen(buffer) == strlen(lparen->symbol)) {
+            // Full match found, store match and stop looking for this token
+            match = *lparen;
+            can_match_lparen = 0;
+          }
+        } else {
+          // Char is not expected char, can no longer be this token
+          can_match_lparen = 0;
+        }
+      }
+      if (can_match_rparen) {
+        if (buffer[j] == rparen->symbol[j]) {
+          // Expected character found, check if full match has been found
+          char_matched = 1;
+          if (strlen(buffer) == strlen(rparen->symbol)) {
+            // Full match found, store match and stop looking for this token
+            match = *rparen;
+            can_match_rparen = 0;
+          }
+        } else {
+          // Char is not expected char, can no longer be this token
+          can_match_rparen = 0;
+        }
+      }
+
+      // Check if any character was matched. If no match, either add the best
+      // found match and continue tokenization or error
+      if (!char_matched) {
+        printf("No char matched: %c\n", str[i + j]);
+        if (strcmp(match.symbol, "")) {
+          // Existing match
+          symbols[*symbol_count] = match;
+          ++*symbol_count;
+          printf("Found symbol: %s\n", match.symbol);
+          i += strlen(match.symbol);
+          printf("Set i to %d\n", i);
+          break;
+        } else {
+          printf("[ERROR] Unexpected character: %c\n", str[i + j]);
+          return;
+        }
+      }
+
+      ++j;
+    }
+  }
 }
 
 // Main function for testing tokenizer functionality
