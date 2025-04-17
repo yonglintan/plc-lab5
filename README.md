@@ -110,17 +110,61 @@ We would like the `CFGSymbol` struct to have the following attributes:
 
 Can you implement the missing code in the `struct CFGSymbol` at the beginning of the code? Show your code.
 
+> ```c
+> typedef struct {
+>   char *symbol;
+>   int is_terminal;
+>   int is_start;
+> } CFGSymbol;
+> ```
+
 ### Question 2-B
 
 For each possible CFG symbol in our Boolean CFG, describe the values of its attributes.
+
+| symbol  | is_terminal | is_start |
+| ------- | ----------- | -------- |
+| "S"     | 0           | 1        |
+| "B"     | 0           | 0        |
+| "T"     | 0           | 0        |
+| "F"     | 0           | 0        |
+| "OR"    | 1           | 0        |
+| "AND"   | 1           | 0        |
+| "("     | 1           | 0        |
+| ")"     | 1           | 0        |
+| "true"  | 1           | 0        |
+| "false" | 1           | 0        |
 
 ### Question 2-C
 
 Implement the function `init_CFGSymbol()`, which initializes a CFGSymbol based on input parameters. Show your code.
 
+> ```c
+> void init_CFGSymbol(CFGSymbol *symbol, char *text, int is_terminal,
+>                     int is_start) {
+>   symbol->symbol = text;
+>   symbol->is_terminal = is_terminal;
+>   symbol->is_start = is_start;
+> }
+> ```
+
 ### Question 2-D
 
 Implement `init_Terminal()`, `init_NonTerminal()`, and `init_StartSymbol()` functions, reusing your function from Question 2-C. Show your code.
+
+> ```c
+> void init_NonTerminal(CFGSymbol *symbol, char *text) {
+>   init_CFGSymbol(symbol, text, 0, 0);
+> }
+>
+> void init_Terminal(CFGSymbol *symbol, char *text) {
+>   init_CFGSymbol(symbol, text, 1, 0);
+> }
+>
+> void init_StartSymbol(CFGSymbol *symbol, char *text) {
+>   init_CFGSymbol(symbol, text, 0, 1);
+> }
+> ```
 
 ### Coding a CFG Production Rule Object and Its Functions
 
@@ -135,17 +179,72 @@ The `CFGProductionRule struct` should contain:
 
 Implement the missing components for the `CFGProductionRule`. Show your code.
 
+> ```c
+> typedef struct {
+>   CFGSymbol lhs;
+>   CFGSymbol rhs[MAX_RHS];
+>   int rhs_length;
+> } CFGProductionRule;
+> ```
+
 ### Question 2-F
 
 Why must `lhs` always be a **non-terminal**? Explain what would happen if it was a terminal symbol.
+
+> The lhs of a production is the symbol that will be converted into another symbol or symbols. Since terminal symbols are symbols that we end up with that can no longer be converted into anything else, having a terminal symbol on the lhs vialates the idea of terminal symbols and production rules. If the lhs was a terminal symbol, we would never be able to end up with that symbol as the symbol would always be able to produce something else.
 
 ### Question 2-G
 
 Implement `createProductionRule()`, ensuring `lhs` is **not a terminal**. Show your code.
 
+> ```c
+> CFGProductionRule createProductionRule(CFGSymbol lhs, CFGSymbol rhs[],
+>                                        int rhs_length) {
+>   CFGProductionRule rule;
+>   int i;
+>
+>   // Check that lhs is not a terminal symbol (otherwise, problem)
+>   if (lhs.is_terminal) {
+>     printf(
+>         "ERR: Found terminal symbol %s on left-hand side of production rule.",
+>         lhs.symbol);
+>     rule.rhs_length = -1;
+>     return rule;
+>   }
+>   rule.lhs = lhs;
+>
+>   // Iterate through the right-hand side symbols and print them.
+>   // Initialize rhs_length to 0.
+>   // Later, count the actual length of rhs until the '\0' symbol is found.
+>   for (i = 0; i < rhs_length; ++i) {
+>     printf("Symbol: %s\n", rhs[i].symbol);
+>     if (rhs[i].symbol[0] == '\0') {
+>       break;
+>     }
+>     rule.rhs[i] = rhs[i];
+>   }
+>   rule.rhs_length = i;
+>   return rule;
+> }
+> ```
+
 ### Question 2-H
 
 Implement `printProductionRule()` to display production rules correctly. Show your code.
+
+> ```c
+> void printProductionRule(CFGProductionRule rule) {
+>   int i;
+>
+>   printf("%s", rule.lhs.symbol);
+>   printf(" --> ");
+>   for (i = 0; i < rule.rhs_length; ++i) {
+>     printf("%s ", rule.rhs[i].symbol);
+>   }
+>   printf("\n");
+>   return;
+> }
+> ```
 
 ### Coding a CFG Object and Its Functions
 
@@ -161,9 +260,39 @@ Finally, we will define a CFG struct containing:
 
 Implement the `CFG` struct. Show your code.
 
+> ```c
+> typedef struct {
+>   CFGSymbol symbols[MAX_SYMBOLS];
+>   CFGSymbol startSymbol;
+>   CFGProductionRule rules[MAX_RULES];
+>   int symbol_count;
+>   int rule_count;
+> } CFG;
+> ```
+
 ### Question 2-J
 
 Implement `init_CFG()`, ensuring the start symbol is assigned correctly. Show your code.
+
+> ```c
+> void init_CFG(CFG *cfg, CFGSymbol symbols[], int symbol_count,
+>               CFGSymbol startSymbol, CFGProductionRule rules[],
+>               int rule_count) {
+>   if (symbol_count > sizeof(cfg->symbols) / sizeof(cfg->symbols[0])) {
+>     printf("Maximum number of tokens exceeded.\n");
+>   }
+>
+>   for (int i = 0; i < symbol_count; ++i) {
+>     cfg->symbols[i] = symbols[i];
+>   }
+>   cfg->startSymbol = startSymbol;
+>   for (int i = 0; i < rule_count; ++i) {
+>     cfg->rules[i] = rules[i];
+>   }
+>   cfg->symbol_count = symbol_count;
+>   cfg->rule_count = rule_count;
+> }
+> ```
 
 ### Question 2-K
 
@@ -192,6 +321,17 @@ Implement `printCFG()`, displaying rules in the format `(k) lhs --> rhs`. Show y
 (7) F --> true
 (8) F --> false
 ```
+
+> ```c
+> void printCFG(const CFG cfg) {
+>   int i;
+>
+>   for (i = 0; i < cfg.rule_count; i++) {
+>     printf("(%d):   ", i + 1);
+>     printProductionRule(cfg.rules[i]);
+>   }
+> }
+> ```
 
 **This concludes Task 2.**
 
