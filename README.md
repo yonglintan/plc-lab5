@@ -2,7 +2,7 @@
 
 Lab 5 of 50.051 Programming Language Concepts
 
-## Task 1: Introduction to Context-Free Grammars.
+## Task 1: Introduction to Context-Free Grammars
 
 As we have seen in class, a Context-Free Grammar (CFG) is a set of recursive rewriting rules (or productions) used to generate patterns of strings. A CFG consists of a set of **terminals** (symbols that appear in the strings), a set of **non-terminals** (symbols that help define the structure but do not appear in the strings), a set of **production rules** connecting symbols to other (combinations of) symbols, and a **start symbol** for the CFG.
 
@@ -29,29 +29,54 @@ In the CFG above, we can identify the following components:
 
 What is the purpose of this CFG?
 
+> This CFG defines the syntax of Boolean expressions.
+
 ### Question 1-B
 
 What types of Boolean expressions does it allow?
+
+> It allows for Boolean expressions with true or false separated by the operators AND and OR. These expressions can be surrounded by parentheses and can contain sub-expressions surrounded by parentheses.
 
 ### Question 1-C
 
 How can this be used in a compiler for syntax validation?
 
+> During parsing, if the expression cannot be derived with this CFG, we know that the syntax is invalid.
+
 ### Question 1-D
 
 Identify the recursive production rules in this CFG. Are they left-recursive? Right-recursive? Both?
+
+> Rules 2 and 4 are left-recursive.
 
 ### Question 1-E
 
 What is the significance behind using such recursions? What would happen if recursion was removed from this CFG?
 
+> If recursion was removed from this CFG, we would be unable to parse recursive or nested expressions. Having such recursions allows for the creation of expressions with unlimited complexity, by chaining or nesting expressions. The recursions also define the associativity rules of the operators.
+
 ### Question 1-F
 
 What is the point of using additional intermediate symbols **B**, **T** and **F**?
 
+> Having intermediate symbols allows the CFG to define the operator precedence and associativity rules. In this case, the AND operator takes precedence of the OR operator, and both operators are left-associative.
+
 ### Question 1-G
 
 How would you modify the CFG in order to include the NOT keyword?
+
+> I would add another rule F => NOT F. Resulting CFG:
+>
+> ```
+> (1): S => B
+> (2): B => B OR T
+> (3): B => T
+> (4): T => T AND F
+> (5): T => F
+> (6): F => ( B )
+> (7): F => true | false
+> (8): F => NOT F
+> ```
 
 **This concludes Task 1.**
 
