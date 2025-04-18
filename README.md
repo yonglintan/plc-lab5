@@ -122,18 +122,18 @@ Can you implement the missing code in the `struct CFGSymbol` at the beginning of
 
 For each possible CFG symbol in our Boolean CFG, describe the values of its attributes.
 
-| symbol  | is_terminal | is_start |
-| ------- | ----------- | -------- |
-| "S"     | 0           | 1        |
-| "B"     | 0           | 0        |
-| "T"     | 0           | 0        |
-| "F"     | 0           | 0        |
-| "OR"    | 1           | 0        |
-| "AND"   | 1           | 0        |
-| "("     | 1           | 0        |
-| ")"     | 1           | 0        |
-| "true"  | 1           | 0        |
-| "false" | 1           | 0        |
+> | symbol  | is_terminal | is_start |
+> | ------- | ----------- | -------- |
+> | "S"     | 0           | 1        |
+> | "B"     | 0           | 0        |
+> | "T"     | 0           | 0        |
+> | "F"     | 0           | 0        |
+> | "OR"    | 1           | 0        |
+> | "AND"   | 1           | 0        |
+> | "("     | 1           | 0        |
+> | ")"     | 1           | 0        |
+> | "true"  | 1           | 0        |
+> | "false" | 1           | 0        |
 
 ### Question 2-C
 
@@ -419,22 +419,22 @@ What would be the regular expression (RegEx) to check whether a string `"s"` is 
 
 What would be the **pseudo-code** for our maximal munch algorithm? Keep it as simple as possible. Show your pseudo-code.
 
-```
-word_start = 0;
-while word_start < length(input_str):
-    increment word_start until it is at non-whitespace character
-    cur_word = ""
-    match = None
-    while any symbol starts with cur_word:
-        for symbol
-            if symbol == cur_word, match = symbol
-        cur_word += next_char
-    if match is None:
-        error
-    else:
-        found_symbols.add(match);
-        word_start += length(match)
-```
+> ```
+> word_start = 0;
+> while word_start < length(input_str):
+>     increment word_start until it is at non-whitespace character
+>     cur_word = ""
+>     match = None
+>     while any symbol starts with cur_word:
+>         for symbol
+>             if symbol == cur_word, match = symbol
+>         cur_word += next_char
+>     if match is None:
+>         error
+>     else:
+>         found_symbols.add(match);
+>         word_start += length(match)
+> ```
 
 ### Implementing a tokenizing function
 
@@ -478,94 +478,94 @@ Actual Tokens : ( true OR false )
 Expected: Error on unexpected character '&'
 ```
 
-```c
-void tokenizeBooleanExpression(char *str, CFGSymbol *symbols, int *symbol_count,
-                               CFGSymbol *and_sym, CFGSymbol *or_sym,
-                               CFGSymbol *true_sym, CFGSymbol *false_sym,
-                               CFGSymbol *lparen, CFGSymbol *rparen) {
-  *symbol_count = 0;       // Reset token count
-  char buffer[MAX_LENGTH]; // Token buffer
-  int i = 0;
-
-  while (str[i] != '\0') {
-    // Skip whitespace
-    if (isspace(str[i])) {
-      ++i;
-      buffer[0] = '\0';
-      continue;
-    }
-
-    CFGSymbol match;
-    match.symbol = "";
-
-    // Reset buffer
-    buffer[0] = '\0';
-    int j = 0;
-
-    while (str[i + j] != '\0') {
-      buffer[j] = str[i + j];
-      buffer[j + 1] = '\0';
-      int partial_match = 0;
-
-      // strncmp tells me whether or not I have a partial match
-      if (!strncmp(buffer, and_sym->symbol, j + 1)) {
-        // check if full match
-        if (strlen(buffer) == strlen(and_sym->symbol)) {
-          match = *and_sym;
-        } else
-          partial_match = 1;
-      }
-      if (!strncmp(buffer, or_sym->symbol, j + 1)) {
-        if (strlen(buffer) == strlen(or_sym->symbol)) {
-          match = *or_sym;
-        } else
-          partial_match = 1;
-      }
-      if (!strncmp(buffer, true_sym->symbol, j + 1)) {
-        if (strlen(buffer) == strlen(true_sym->symbol)) {
-          match = *true_sym;
-        } else
-          partial_match = 1;
-      }
-      if (!strncmp(buffer, false_sym->symbol, j + 1)) {
-        if (strlen(buffer) == strlen(false_sym->symbol)) {
-          match = *false_sym;
-        } else
-          partial_match = 1;
-      }
-      if (!strncmp(buffer, lparen->symbol, j + 1)) {
-        if (strlen(buffer) == strlen(lparen->symbol)) {
-          match = *lparen;
-        } else
-          partial_match = 1;
-      }
-      if (!strncmp(buffer, rparen->symbol, j + 1)) {
-        if (strlen(buffer) == strlen(rparen->symbol)) {
-          match = *rparen;
-        } else
-          partial_match = 1;
-      }
-
-      // Check if any partial matches. If none, either add the best
-      // found match and continue tokenization or error
-      if (!partial_match) {
-        if (strcmp(match.symbol, "")) {
-          // Existing match
-          symbols[*symbol_count] = match;
-          ++*symbol_count;
-          i += strlen(match.symbol);
-          break;
-        } else {
-          printf("[ERROR] Unexpected character: %c\n", str[i + j]);
-          return;
-        }
-      }
-
-      ++j;
-    }
-  }
-}
-```
+> ```c
+> void tokenizeBooleanExpression(char *str, CFGSymbol *symbols, int *symbol_count,
+>                                CFGSymbol *and_sym, CFGSymbol *or_sym,
+>                                CFGSymbol *true_sym, CFGSymbol *false_sym,
+>                                CFGSymbol *lparen, CFGSymbol *rparen) {
+>   *symbol_count = 0;       // Reset token count
+>   char buffer[MAX_LENGTH]; // Token buffer
+>   int i = 0;
+>
+>   while (str[i] != '\0') {
+>     // Skip whitespace
+>     if (isspace(str[i])) {
+>       ++i;
+>       buffer[0] = '\0';
+>       continue;
+>     }
+>
+>     CFGSymbol match;
+>     match.symbol = "";
+>
+>     // Reset buffer
+>     buffer[0] = '\0';
+>     int j = 0;
+>
+>     while (str[i + j] != '\0') {
+>       buffer[j] = str[i + j];
+>       buffer[j + 1] = '\0';
+>       int partial_match = 0;
+>
+>       // strncmp tells me whether or not I have a partial match
+>       if (!strncmp(buffer, and_sym->symbol, j + 1)) {
+>         // check if full match
+>         if (strlen(buffer) == strlen(and_sym->symbol)) {
+>           match = *and_sym;
+>         } else
+>           partial_match = 1;
+>       }
+>       if (!strncmp(buffer, or_sym->symbol, j + 1)) {
+>         if (strlen(buffer) == strlen(or_sym->symbol)) {
+>           match = *or_sym;
+>         } else
+>           partial_match = 1;
+>       }
+>       if (!strncmp(buffer, true_sym->symbol, j + 1)) {
+>         if (strlen(buffer) == strlen(true_sym->symbol)) {
+>           match = *true_sym;
+>         } else
+>           partial_match = 1;
+>       }
+>       if (!strncmp(buffer, false_sym->symbol, j + 1)) {
+>         if (strlen(buffer) == strlen(false_sym->symbol)) {
+>           match = *false_sym;
+>         } else
+>           partial_match = 1;
+>       }
+>       if (!strncmp(buffer, lparen->symbol, j + 1)) {
+>         if (strlen(buffer) == strlen(lparen->symbol)) {
+>           match = *lparen;
+>         } else
+>           partial_match = 1;
+>       }
+>       if (!strncmp(buffer, rparen->symbol, j + 1)) {
+>         if (strlen(buffer) == strlen(rparen->symbol)) {
+>           match = *rparen;
+>         } else
+>           partial_match = 1;
+>       }
+>
+>       // Check if any partial matches. If none, either add the best
+>       // found match and continue tokenization or error
+>       if (!partial_match) {
+>         if (strcmp(match.symbol, "")) {
+>           // Existing match
+>           symbols[*symbol_count] = match;
+>           ++*symbol_count;
+>           i += strlen(match.symbol);
+>           break;
+>         } else {
+>           printf("[ERROR] Unexpected character: %c\n", str[i + j]);
+>           return;
+>         }
+>       }
+>
+>       ++j;
+>     }
+>   }
+> }
+> ```
 
 **This concludes Task 3.**
 
@@ -587,6 +587,34 @@ Our objective is to define several functions:
 
 Consider the Boolean expression `true AND (false OR true)`. What is a valid derivation for this expression? List the production rules used and which symbol was modified. Indicate the position index of each replacement.
 
+> ```
+> S
+> - Rule: S -> B, Modified: S, Position: 0
+> B
+> - Rule: B -> T, Modified: B, Position: 0
+> T
+> - Rule: T -> T AND F, Modified: T, Position: 0
+> T AND F
+> - Rule: T -> F, Modified: T, Position: 0
+> F AND F
+> - Rule: F -> true, Modified: F, Position: 0
+> true AND F
+> - Rule: F -> (B), Modified: F, Position: 2
+> true AND (B)
+> - Rule: B -> B OR T, Modified: B, Position: 3
+> true AND (B OR T)
+> - Rule: B -> T, Modified: B, Position: 3
+> true AND (T OR T)
+> - Rule: T -> F, Modified: T, Position: 3
+> true AND (F OR T)
+> - Rule: F -> false, Modified: F, Position: 3
+> true AND (false OR T)
+> - Rule: T -> F, Modified: T, Position: 5
+> true AND (false OR F)
+> - Rule: F -> true, Modified: F, Position: 5
+> true AND (false OR true)
+> ```
+
 ### Initializing the Array of CFGSymbols
 
 The function `startDerivation()` receives:
@@ -605,17 +633,51 @@ We want the following function behavior:
 
 Implement `CFGSymbol` Struct. Show your code.
 
+> ```c
+> typedef struct {
+>   char *symbol;
+>   int is_terminal;
+>   int is_start;
+> } CFGSymbol;
+> ```
+
 ### Question 4-C
 
 Implement `CFGProductionRule` Struct. Show your code.
+
+> ```c
+> typedef struct {
+>   CFGSymbol lhs;
+>   CFGSymbol rhs[MAX_RHS];
+>   int rhs_length;
+> } CFGProductionRule;
+> ```
 
 ### Question 4-D
 
 Implement `CFG` Struct. Show your code.
 
+> ```c
+> typedef struct {
+>   CFGSymbol symbols[MAX_SYMBOLS];
+>   CFGSymbol startSymbol;
+>   CFGProductionRule rules[MAX_RULES];
+>   int symbol_count;
+>   int rule_count;
+> } CFG;
+> ```
+
 ### Question 4-E
 
 Implement `startDerivation()`. Show your code.
+
+> ```c
+> void startDerivation(CFGSymbol *derivation, int *derivation_length, CFG *cfg) {
+>   printf("Start Derivation\n");
+>   derivation[0] = cfg->startSymbol;
+>   *derivation_length = 1;
+> }
+> ```
 
 ### Applying a Production Rule on a Given Symbol
 
@@ -637,6 +699,42 @@ We want the following function behavior:
 ### Question 4-F
 
 Implement `applyProductionRule()`. Show your code.
+
+> ```c
+> void applyProductionRule(CFGSymbol *derivation, int *derivation_length,
+>                          CFG *cfg, int ruleIndex, int position) {
+>   if (ruleIndex > cfg->rule_count) {
+>     // check the rule index
+>     printf("Invalid rule index.\n");
+>     return;
+>   }
+>   CFGProductionRule rule = cfg->rules[ruleIndex - 1];
+>
+>   // Ensure the position is valid and matches the LHS of the production rule
+>   if (position < *derivation_length &&
+>       strcmp(derivation[position].symbol, rule.lhs.symbol)) {
+>     printf("Rule cannot be applied at the given position.\n");
+>     return;
+>   }
+>
+>   // Calculate new derivation length after applying the rule
+>   *derivation_length = *derivation_length + rule.rhs_length - 1;
+>   if (*derivation_length > MAX_TOKENS) {
+>     printf("Applying the rule exceeds the maximum derivation length.\n");
+>     return;
+>   }
+>
+>   // Shift symbols to accommodate the new RHS symbols
+>   for (int i = *derivation_length - 1; i == position; --i) {
+>     derivation[i] = derivation[i - (rule.rhs_length - 1)];
+>   }
+>
+>   // Insert RHS symbols into the derivation array
+>   for (int i = 0; i < rule.rhs_length; ++i) {
+>     derivation[position + i] = rule.rhs[i];
+>   }
+> }
+> ```
 
 ### Checking for a Valid Derivation
 
@@ -682,5 +780,26 @@ Derivation unsuccessful: Mismatch at position 0: expected F, got T
 [Test] Exact match with tokens
 Derivation successful!
 ```
+
+> ```c
+> int checkDerivation(CFGSymbol *derivation, int derivation_length,
+>                     CFGSymbol *tokens, int token_count) {
+>   if (derivation_length != token_count) { // check length matching
+>     printf("Derivation unsuccessful: Length mismatch.\n");
+>     return 0;
+>   }
+>
+>   for (int i = 0; i < derivation_length; ++i) {
+>     if (strcmp(derivation[i].symbol,
+>                tokens[i].symbol)) { // check position matching
+>       printf("Derivation unsuccessful: Mismatch at position %d.\n", i);
+>       return 0;
+>     }
+>   }
+>
+>   printf("Derivation successful!\n");
+>   return 1;
+> }
+> ```
 
 **This concludes Task 4.**
